@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class Film {
 
-    private int id;
+    private int id; //id
     private String name;
     private String description;
     private LocalDateTime releaseDate;
