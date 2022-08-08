@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NoMovieFoundException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -16,8 +16,8 @@ public class FilmServiceImpl implements FilmService {
 
     private static final Map<Integer, Film> films = new HashMap<>();
     private static int id;
-    private static final LocalDate birthdayMovie = LocalDate.of(1895,12,28);
-    private static final int limitDescription = 200;
+    private static final LocalDate BIRTHDAY_MOVIE = LocalDate.of(1895,12,28);
+    private static final int LIMIT_DESCRIPTION = 200;
 
     @Override
     public Film create(Film film) throws ValidationException {
@@ -38,7 +38,7 @@ public class FilmServiceImpl implements FilmService {
 
 
     @Override
-    public Film update(Film film) throws ValidationException, NoMovieFoundException {
+    public Film update(Film film) throws ValidationException, EntityNotFoundException {
         if (films.containsKey(film.getId())) {
             validate(film);
             films.put(film.getId(), film);
@@ -46,7 +46,7 @@ public class FilmServiceImpl implements FilmService {
             return film;
         } else {
             log.info("NoMovieFoundException (Фильм не может быть обновлен, т.к. его нет в списке)");
-            throw new NoMovieFoundException("Фильм не может быть обновлен, т.к. его нет в списке");
+            throw new EntityNotFoundException("Фильм не может быть обновлен, т.к. его нет в списке");
         }
     }
 
@@ -56,11 +56,11 @@ public class FilmServiceImpl implements FilmService {
             log.info("ValidationException (Пустое название фильма)");
             throw new ValidationException("Пустое название фильма");
         }
-        if (film.getDescription().length() > limitDescription) {
+        if (film.getDescription().length() > LIMIT_DESCRIPTION) {
             log.info("ValidationException (Выход за пределы длины описания фильма)");
             throw new ValidationException("Выход за пределы длины описания фильма");
         }
-        if (film.getReleaseDate().isBefore(birthdayMovie)) {
+        if (film.getReleaseDate().isBefore(BIRTHDAY_MOVIE)) {
             log.info("ValidationException (Дата релиза раньше дня рождения кино)");
             throw new ValidationException("Дата релиза раньше дня рождения кино");
         }
