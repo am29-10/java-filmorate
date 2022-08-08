@@ -31,37 +31,35 @@ public class FilmControllerTest {
     @Test
     void validateNameTest() {
         film.setName(" ");
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Пустое название фильма", exception.getMessage());
     }
 
     @Test
     void validateDescriptionTest() {
-        film.setDescription("«Властелин колец» является одним из самых крупных проектов в истории кино, " +
-                "а его реализация заняла восемь лет и все три фильма были сняты одновременно в Новой Зеландии, " +
-                "стране режиссёра Питера Джексона.");
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        film.setDescription("a".repeat(201));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Выход за пределы длины описания фильма", exception.getMessage());
     }
 
     @Test
     void validateReleaseDateTest() {
         film.setReleaseDate(LocalDate.of(1895, 12, 20));
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Дата релиза раньше дня рождения кино", exception.getMessage());
     }
 
     @Test
     void validateDurationTest() {
         film.setDuration(-2);
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Продолжительность фильма имеет отрицательное значение", exception.getMessage());
     }
 
     @Test
     void validateIdTest() {
         film.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Значение id не может быть отрицательным", exception.getMessage());
     }
 }
