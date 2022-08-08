@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NoMovieFoundException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -19,7 +19,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> getAll() throws NoMovieFoundException {
+    public List<Film> getAll() throws EntityNotFoundException {
         return new ArrayList<>(filmService.readAll().values());
     }
 
@@ -29,7 +29,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody Film film) throws ValidationException, NoMovieFoundException {
+    public Film update(@RequestBody Film film) throws ValidationException, EntityNotFoundException {
         return filmService.update(film);
     }
 }

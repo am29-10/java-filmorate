@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NoMovieFoundException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -24,27 +24,27 @@ public class UserServiceImpl implements UserService {
         }
         validate(user);
         users.put(user.getId(), user);
-        log.info("Фильм с id '{}' добавлен в список", user.getId());
+        log.info("Пользователь с id '{}' добавлен в список", user.getId());
         return user;
     }
 
     @Override
     public Map<Integer, User> readAll() {
-        log.info("Количество имеющихся фильмов: {}", users.size());
+        log.info("Количество имеющихся пользователей: {}", users.size());
         return users;
 
     }
 
     @Override
-    public User update(User user) throws ValidationException, NoMovieFoundException {
+    public User update(User user) throws ValidationException, EntityNotFoundException {
         if (users.containsKey(user.getId())) {
             validate(user);
             users.put(user.getId(), user);
-            log.info("Фильм с id '{}' обновлен", user.getId());
+            log.info("Пользователь с id '{}' обновлен", user.getId());
             return user;
         } else {
-            log.info("NoMovieFoundException (Фильм не может быть обновлен, т.к. его нет в списке)");
-            throw new NoMovieFoundException("Фильм не может быть обновлен, т.к. его нет в списке");
+            log.info("NoMovieFoundException (Пользователь не может быть обновлен, т.к. его нет в списке)");
+            throw new EntityNotFoundException("Пользователь не может быть обновлен, т.к. его нет в списке");
         }
     }
 

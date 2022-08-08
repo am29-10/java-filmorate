@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.exceptions.NoMovieFoundException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -10,8 +10,8 @@ public interface FilmService {
 
     Film create(Film film) throws ValidationException;
 
-    Map<Integer, Film> readAll() throws NoMovieFoundException;
+    Map<Integer, Film> readAll() throws EntityNotFoundException;
 
-    Film update(Film film) throws ValidationException, NoMovieFoundException;
+    Film update(Film film) throws ValidationException, EntityNotFoundException;
 
 }
