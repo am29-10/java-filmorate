@@ -32,35 +32,35 @@ public class UserControllerTest {
     @Test
     void validateEmailTest() {
         user.setEmail("Bob23");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Пустой email или email не содержит '@'", exception.getMessage());
     }
 
     @Test
     void validateLoginTest() {
         user.setLogin("charm 2910");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Пустой логин или логин содержит пробелы", exception.getMessage());
     }
 
     @Test
     void validateNameTest() throws ValidationException {
         user.setName("");
-        userController.createUser(user);
+        userController.create(user);
         assertEquals("charm2910", user.getName());
     }
 
     @Test
     void  validateBirthdayTest() {
         user.setBirthday(LocalDate.of(2023, 1, 1));
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Дата рождения указана в будущем времени", exception.getMessage());
     }
 
     @Test
     void validateIdTest() {
         user.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Значение id не может быть отрицательным", exception.getMessage());
     }
 }
