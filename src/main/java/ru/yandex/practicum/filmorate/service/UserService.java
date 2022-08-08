@@ -1,18 +1,16 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.exceptions.NoMovieFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Map;
 
 public interface UserService {
-    void create(User user);
+    User create(User user) throws ValidationException;
 
-    Map<Integer, User> readAll();
+    Map<Integer, User> readAll() throws NoMovieFoundException;
 
-    User read(int id);
+    User update(User user) throws ValidationException, NoMovieFoundException;
 
-    void update(User user);
-
-    void delete(int id);
 }
