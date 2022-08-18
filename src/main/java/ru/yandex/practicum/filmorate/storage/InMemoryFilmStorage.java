@@ -1,18 +1,19 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
 @Slf4j
-public class FilmServiceImpl implements FilmService {
+@Component
+public class InMemoryFilmStorage implements FilmStorage {
 
     private static final Map<Integer, Film> films = new HashMap<>();
     private static int id;
@@ -20,7 +21,7 @@ public class FilmServiceImpl implements FilmService {
     private static final int LIMIT_DESCRIPTION = 200;
 
     @Override
-    public Film create(Film film) throws ValidationException {
+    public Film create(Film film) {
         if (film.getId() == 0) {
             film.setId(++id);
         }
@@ -38,7 +39,7 @@ public class FilmServiceImpl implements FilmService {
 
 
     @Override
-    public Film update(Film film) throws ValidationException, EntityNotFoundException {
+    public Film update(Film film) {
         if (films.containsKey(film.getId())) {
             validate(film);
             films.put(film.getId(), film);
@@ -51,7 +52,8 @@ public class FilmServiceImpl implements FilmService {
     }
 
 
-    public void validate(Film film) throws ValidationException {
+
+    public void validate(Film film) {
         if (film.getName().isEmpty() || film.getName().isBlank()) {
             log.info("ValidationException (Пустое название фильма)");
             throw new ValidationException("Пустое название фильма");

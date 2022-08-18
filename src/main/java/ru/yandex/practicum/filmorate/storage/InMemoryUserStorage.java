@@ -1,7 +1,7 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -10,15 +10,15 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
 @Slf4j
-public class UserServiceImpl implements UserService {
+@Component
+public class InMemoryUserStorage implements UserStorage {
 
     private static final Map<Integer, User> users = new HashMap<>();
     private static int id;
 
     @Override
-    public User create(User user) throws ValidationException {
+    public User create(User user) {
         if (user.getId() == 0) {
             user.setId(++id);
         }
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(User user) throws ValidationException, EntityNotFoundException {
+    public User update(User user) {
         if (users.containsKey(user.getId())) {
             validate(user);
             users.put(user.getId(), user);
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void validate(User user) throws ValidationException {
+    public void validate(User user) {
         if (user.getEmail().isEmpty() || user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
             log.info("ValidationException (Пустой email или email не содержит '@')");
             throw new ValidationException("Пустой email или email не содержит '@'");
