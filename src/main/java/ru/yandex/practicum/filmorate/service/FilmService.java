@@ -30,9 +30,17 @@ public class FilmService {
     public Film update(Film film) {
         return filmStorage.update(film);
     }
+
+    public Film getFilmById(int id) {
+        if (readAll().containsKey(id)) {
+            return readAll().get(id);
+        } else {
+            throw new EntityNotFoundException(String.format("Фильма с id=%d нет в списке", id));
+        }
+    }
     public void addLike(int userId, int filmId) {
         if (userStorage.readAll().containsKey(userId) && readAll().containsKey(filmId)) {
-            readAll().get(filmId).getLikes().add(userId);
+            getFilmById(filmId).getLikes().add(userId);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
         }
@@ -40,16 +48,16 @@ public class FilmService {
 
     public void removeLike(int userId, int filmId) {
         if (userStorage.readAll().containsKey(userId) && readAll().containsKey(filmId)) {
-            readAll().get(filmId).getLikes().remove(userId);
+            getFilmById(filmId).getLikes().remove(userId);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
         }
     }
 
-    public List<Film> getTop10Films() {
+    public List<Film> getPopularFilms(int count) {
         return readAll().values().stream()
                 .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
-                .limit(10)
+                .limit(count)
                 .collect(Collectors.toList());
     }
 }
