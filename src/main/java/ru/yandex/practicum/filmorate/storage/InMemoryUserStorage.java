@@ -19,10 +19,10 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User create(User user) {
+        validate(user);
         if (user.getId() == 0) {
             user.setId(++id);
         }
-        validate(user);
         users.put(user.getId(), user);
         log.info("Пользователь с id '{}' добавлен в список", user.getId());
         return user;
@@ -30,7 +30,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Map<Integer, User> readAll() {
-        log.info("Количество имеющихся пользователей: {}", users.size());
         return users;
 
     }

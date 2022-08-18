@@ -22,10 +22,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
+        validate(film);
         if (film.getId() == 0) {
             film.setId(++id);
         }
-        validate(film);
         films.put(film.getId(), film);
         log.info("Фильм с id '{}' добавлен в список", film.getId());
         return film;
@@ -33,7 +33,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Map<Integer, Film> readAll() {
-        log.info("Количество имеющихся фильмов: {}", films.size());
         return films;
     }
 
