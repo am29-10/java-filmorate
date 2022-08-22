@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.List;
 import java.util.Map;
 
 public interface FilmStorage {
@@ -14,4 +13,7 @@ public interface FilmStorage {
 
     Film update(Film film);
 
+    Film getFilmById(int id);
+
+    List<Film> getPopularFilms(int count);
 }
