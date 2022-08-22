@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -22,7 +21,7 @@ public class UserControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController(new UserService(new InMemoryUserStorage()));
+        userController = new UserController(new UserService());
         user = new User();
         user.setName("Фродо Бэггинс");
         user.setBirthday(LocalDate.of(1999, 10, 29));
