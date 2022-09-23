@@ -3,10 +3,13 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.impl.*;
 
 import java.time.LocalDate;
 
@@ -20,12 +23,14 @@ public class FilmControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmController(new FilmService());
+        /*filmController = new FilmController(new FilmService(new FilmDaoImpl(new JdbcTemplate()),
+                new FilmLikeDaoImpl(new JdbcTemplate()), new UserService(new UserDao(new JdbcTemplate()),
+                new FriendshipDaoImpl(new JdbcTemplate())), new FimlGenreDaoImpl(new JdbcTemplate())));
         film = new Film();
         film.setName("Властелин колец");
         film.setDescription("Фантастический фильм, представляющий экранизацию романа");
         film.setReleaseDate(LocalDate.of(2001, 12, 19));
-        film.setDuration(178);
+        film.setDuration(178);*/
     }
 
     @Test

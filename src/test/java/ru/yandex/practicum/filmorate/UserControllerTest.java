@@ -3,10 +3,14 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FriendshipDao;
+import ru.yandex.practicum.filmorate.storage.impl.FriendshipDaoImpl;
+import ru.yandex.practicum.filmorate.storage.impl.UserDao;
 
 import java.time.LocalDate;
 
@@ -21,7 +25,8 @@ public class UserControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController(new UserService());
+        userController = new UserController(new UserService(new UserDao(new JdbcTemplate()), new FriendshipDaoImpl(new JdbcTemplate()) {
+        }));
         user = new User();
         user.setName("Фродо Бэггинс");
         user.setBirthday(LocalDate.of(1999, 10, 29));
