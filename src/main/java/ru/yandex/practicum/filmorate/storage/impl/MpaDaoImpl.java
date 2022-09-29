@@ -43,4 +43,11 @@ public class MpaDaoImpl implements MpaDao {
         return jdbcTemplate.query("SELECT * FROM MPA WHERE id = ?", new Object[]{id},
                 new BeanPropertyRowMapper<>(Mpa.class)).stream().findAny().orElse(null);
     }
+    @Override
+    public Mpa getMpaByFilmId(int id) {
+        return jdbcTemplate.query("SELECT MPA.* FROM MPA " +
+                        "JOIN FILMS F on MPA.ID = F.MPA_ID " +
+                        "WHERE F.ID = ?", new Object[]{id},
+                new BeanPropertyRowMapper<>(Mpa.class)).stream().findAny().orElse(null);
+    }
 }

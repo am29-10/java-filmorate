@@ -30,7 +30,8 @@ public class FilmGenreDaoImpl implements FilmGenreDao {
         return jdbcTemplate.query("SELECT GENRES.ID, GENRES.NAME " +
                         "FROM GENRES " +
                         "JOIN FILM_GENRE ON GENRES.id = FILM_GENRE.genre_id " +
-                        "WHERE FILM_GENRE.film_id = ?",
+                        "WHERE FILM_GENRE.film_id = ? " +
+                        "ORDER BY GENRES.ID ",
                 new BeanPropertyRowMapper<>(Genre.class), filmId);
     }
 

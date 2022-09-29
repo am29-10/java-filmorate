@@ -39,27 +39,27 @@ public class FilmLikeDaoImpl implements FilmLikeDao {
 
     @Override
     public List<Film> getPopularFilms(int count) {
-        List<Film> films = jdbcTemplate.query("SELECT *, COUNT(user_id) AS likes " +
-                        "FROM FILMS " +
-                        "LEFT JOIN LIKES ON LIKES.FILM_ID = FILMS.ID " +
-                        "GROUP BY FILMS.ID " +
-                        "ORDER BY likes " +
-                        "DESC LIMIT ?",
+        List<Film> films = jdbcTemplate.query("SELECT F.* " +
+                        "FROM FILMS F, MPA M " +
+                        "WHERE F.MPA_ID=M.ID " +
+                        "ORDER BY M.NAME DESC " +
+                        "LIMIT ? ",
                 new BeanPropertyRowMapper<>(Film.class), count);
-        for (Film film: films) {
-            Mpa mpa = jdbcTemplate.query("SELECT MPA.ID, MPA.NAME, MPA.DESCRIPTION FROM MPA " +
-                            "JOIN FILMS ON FILMS.MPA_ID = MPA.ID " +
-                            "WHERE FILMS.ID = ?", new Object[]{film.getId()},
-                    new BeanPropertyRowMapper<>(Mpa.class)).stream().findAny().orElse(null);
-            film.setMpa(mpa);
-            List<Genre> genresByFilm = jdbcTemplate.query("SELECT * FROM (SELECT GENRE_ID " +
-                            "FROM FILM_GENRE " +
-                            "WHERE FILM_ID = ?) AS GENRES_BY_FILM " +
-                            "RIGHT JOIN FILMS ON GENRES_BY_FILM.GENRE_ID = FILMS.ID " +
-                            "JOIN GENRES ON GENRES.ID = GENRES_BY_FILM.GENRE_ID",
-                    new BeanPropertyRowMapper<>(Genre.class), film.getId());
-            film.setGenres(genresByFilm);
-        }
+
+//        for (Film film: films) {
+//            Mpa mpa = jdbcTemplate.query("SELECT MPA.ID, MPA.NAME, MPA.DESCRIPTION FROM MPA " +
+//                            "JOIN FILMS ON FILMS.MPA_ID = MPA.ID " +
+//                            "WHERE FILMS.ID = ?", new Object[]{film.getId()},
+//                    new BeanPropertyRowMapper<>(Mpa.class)).stream().findAny().orElse(null);
+//            film.setMpa(mpa);
+//            List<Genre> genresByFilm = jdbcTemplate.query("SELECT * FROM (SELECT GENRE_ID " +
+//                            "FROM FILM_GENRE " +
+//                            "WHERE FILM_ID = ?) AS GENRES_BY_FILM " +
+//                            "RIGHT JOIN FILMS ON GENRES_BY_FILM.GENRE_ID = FILMS.ID " +
+//                            "JOIN GENRES ON GENRES.ID = GENRES_BY_FILM.GENRE_ID",
+//                    new BeanPropertyRowMapper<>(Genre.class), film.getId());
+//            film.setGenres(genresByFilm);
+//        }
         return films;
     }
 
