@@ -23,13 +23,12 @@ public class MpaService {
     }
 
     public Mpa create(Mpa mpa) {
-        if(validateMpaId(mpa.getId())) {
+        if(mpaDao.getMpaById(mpa.getId()) != null) {
             throw new ValidationException("MPA с таким id уже есть в базе");
         }
         validate(mpa);
-        mpaDao.create(mpa);
         log.info("MPA с id '{}' добавлен в список", mpa.getId());
-        return mpa;
+        return mpaDao.create(mpa);
     }
 
     public List<Mpa> readAll() {
@@ -37,11 +36,10 @@ public class MpaService {
     }
 
     public Mpa update(Mpa mpa) {
-        if (validateMpaId(mpa.getId())) {
+        if (mpaDao.getMpaById(mpa.getId()) != null) {
             validate(mpa);
-            mpaDao.update(mpa);
             log.info("MPA с id '{}' обновлен", mpa.getId());
-            return mpa;
+            return mpaDao.update(mpa);
         } else {
             log.info("EntityNotFoundException (MPA не может быть обновлен, т.к. его нет в списке)");
             throw new EntityNotFoundException("MPA не может быть обновлен, т.к. его нет в списке");
@@ -49,7 +47,7 @@ public class MpaService {
     }
 
     public Mpa getMpaById(int id) {
-        if (validateMpaId(id)) {
+        if (mpaDao.getMpaById(id) != null) {
             return mpaDao.getMpaById(id);
         } else {
             throw new EntityNotFoundException(String.format("MPA с id=%d нет в списке", id));
@@ -65,16 +63,5 @@ public class MpaService {
             log.info("ValidationException (Значение id не может быть отрицательным)");
             throw new ValidationException("Значение id не может быть отрицательным");
         }
-    }
-
-    private boolean validateMpaId(int id) {
-        boolean isInStock = false;
-        for (Mpa mpa : mpaDao.readAll()) {
-            int mpaId = mpa.getId();
-            if (mpaId == id) {
-                isInStock = true;
-            }
-        }
-        return isInStock;
     }
 }

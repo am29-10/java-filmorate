@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendshipDao;
-import ru.yandex.practicum.filmorate.storage.impl.UserDao;
+import ru.yandex.practicum.filmorate.storage.UserDao;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,19 +24,21 @@ public class UserService {
     }
 
     public User create(User user) {
-        if(validateUserId(user.getId())) {
+        validate(user);
+        if(userDao.getUserById(user.getId()) != null) {
             throw new ValidationException("Пользователь с таким id уже есть в базе");
         }
-        validate(user);
-        log.info("Пользователь с id '{}' добавлен в список", user.getId());
-        return userDao.create(user);
+        User createUser = userDao.create(user);
+        log.info("Пользователь с id '{}' добавлен в список", createUser.getId());
+        return createUser;
     }
 
     public User update(User user) {
-        if (validateUserId(user.getId())) {
-            validate(user);
-            log.info("Пользователь с id '{}' обновлен", user.getId());
-            return userDao.update(user);
+        validate(user);
+        if (userDao.getUserById(user.getId()) != null) {
+            User updateUser = userDao.update(user);
+            log.info("Пользователь с id '{}' обновлен", updateUser.getId());
+            return updateUser;
         } else {
             log.info("NoMovieFoundException (Пользователь не может быть обновлен, т.к. его нет в списке)");
             throw new EntityNotFoundException("Пользователь не может быть обновлен, т.к. его нет в списке");
@@ -48,14 +50,14 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        if (validateUserId(id)) {
+        if (userDao.getUserById(id) != null) {
             return userDao.getUserById(id);
         } else {
             throw new EntityNotFoundException(String.format("Пользователя с id=%d нет в списке", id));
         }
     }
     public void addFriend(int userID, int friendID) {
-        if (validateUserId(userID) && validateUserId(friendID)) {
+        if (userDao.getUserById(userID) != null && userDao.getUserById(friendID) != null) {
             friendshipDao.create(userID, friendID);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
@@ -63,7 +65,7 @@ public class UserService {
     }
 
     public void deleteFriend(int userID, int friendID) {
-        if (validateUserId(userID) && validateUserId(friendID)) {
+        if (userDao.getUserById(userID) != null && userDao.getUserById(friendID) != null) {
             friendshipDao.delete(userID, friendID);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
@@ -75,7 +77,7 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int userID, int friendID) {
-        if (validateUserId(userID) && validateUserId(friendID)) {
+        if (userDao.getUserById(userID) != null && userDao.getUserById(friendID) != null) {
             return friendshipDao.getCommonFriends(userID, friendID);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
@@ -99,20 +101,8 @@ public class UserService {
             log.info("ValidationException (Дата рождения указана в будущем времени)");
             throw new ValidationException("Дата рождения указана в будущем времени");
         }
-        if (user.getId() < 0) {
-            log.info("ValidationException (Значение id не может быть отрицательным)");
-            throw new ValidationException("Значение id не может быть отрицательным");
-        }
     }
 
-    public boolean validateUserId(int id) {
-        boolean isInStock = false;
-        for (User user : userDao.readAll()) {
-            int userId = user.getId();
-            if (userId == id) {
-                isInStock = true;
-            }
-        }
-        return isInStock;
-    }
+
+
 }

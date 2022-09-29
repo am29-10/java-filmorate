@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreDao;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -22,13 +24,13 @@ public class GenreService {
     }
 
     public Genre create(Genre genre) {
-        if(validateGenreId(genre.getId())) {
+        validate(genre);
+        if(genreDao.getGenreById(genre.getId()) != null) {
             throw new ValidationException("Жанр с таким id уже есть в базе");
         }
-        validate(genre);
-        genreDao.create(genre);
+        Genre newGenre = genreDao.create(genre);
         log.info("Жанр с id '{}' добавлен в список", genre.getId());
-        return genre;
+        return newGenre;
     }
 
     public List<Genre> readAll() {
@@ -36,11 +38,10 @@ public class GenreService {
     }
 
     public Genre update(Genre genre) {
-        if (validateGenreId(genre.getId())) {
-            validate(genre);
-            genreDao.update(genre);
+        validate(genre);
+        if (genreDao.getGenreById(genre.getId()) != null) {
             log.info("Жанр с id '{}' обновлен", genre.getId());
-            return genre;
+            return genreDao.update(genre);
         } else {
             log.info("EntityNotFoundException (Жанр не может быть обновлен, т.к. его нет в списке)");
             throw new EntityNotFoundException("Жанр не может быть обновлен, т.к. его нет в списке");
@@ -48,7 +49,7 @@ public class GenreService {
     }
 
     public Genre getGenreById(int id) {
-        if (validateGenreId(id)) {
+        if (genreDao.getGenreById(id) != null) {
             return genreDao.getGenreById(id);
         } else {
             throw new EntityNotFoundException(String.format("Жанра с id=%d нет в списке", id));
@@ -66,14 +67,4 @@ public class GenreService {
         }
     }
 
-    private boolean validateGenreId(int id) {
-        boolean isInStock = false;
-        for (Genre genre : genreDao.readAll()) {
-            int genreId = genre.getId();
-            if (genreId == id) {
-                isInStock = true;
-            }
-        }
-        return isInStock;
-    }
 }

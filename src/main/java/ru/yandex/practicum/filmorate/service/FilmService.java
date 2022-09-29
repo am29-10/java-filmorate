@@ -7,10 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.FilmDao;
-import ru.yandex.practicum.filmorate.storage.FilmGenreDao;
-import ru.yandex.practicum.filmorate.storage.FilmLikeDao;
-import ru.yandex.practicum.filmorate.storage.MpaDao;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,48 +21,58 @@ public class FilmService {
     FilmDao filmDao;
     FilmLikeDao filmLikeDao;
     UserService userService;
+    UserDao userDao;
 
     FilmGenreDao filmGenreDao;
     MpaDao mpaDao;
 
     @Autowired
-    public FilmService(FilmDao filmDao, FilmLikeDao filmLikeDao, UserService userService, FilmGenreDao filmGenreDao, MpaDao mpaDao) {
+    public FilmService(FilmDao filmDao, FilmLikeDao filmLikeDao, UserService userService, FilmGenreDao filmGenreDao,
+                       MpaDao mpaDao, UserDao userDao) {
         this.filmDao = filmDao;
         this.filmLikeDao = filmLikeDao;
         this.userService = userService;
         this.filmGenreDao = filmGenreDao;
         this.mpaDao = mpaDao;
+        this.userDao = userDao;
     }
 
     public Film create(Film film) {
-        if(validateFilmId(film.getId())) {
+        validate(film);
+        if(filmDao.getFilmById(film.getId()) != null) {
             throw new ValidationException("Фильм с таким id уже есть в базе");
         }
-        validate(film);
-        filmDao.create(film);
-        log.info("Фильм с id '{}' добавлен в список", film.getId());
+        Film newFilm = filmDao.create(film);
+        log.info("Фильм с id '{}' добавлен в список", newFilm.getId());
+        newFilm.setMpa(mpaDao.getMpaById(film.getMpa().getId()));
         if (film.getGenres() != null) {
-            addFilmGenre(film.getId(), new HashSet<>(film.getGenres()));
-            film.setGenres(filmGenreDao.readGenresByFilmId(film.getId()));
+            addFilmGenre(newFilm.getId(), new HashSet<>(film.getGenres()));
+            newFilm.setGenres(filmGenreDao.readGenresByFilmId(film.getId()));
         }
-        return film;
+        return newFilm;
     }
 
     public List<Film> readAll() {
-        return filmDao.readAll();
+        List<Film> allFilms = filmDao.readAll();
+        for (Film film :allFilms) {
+            film.setMpa(mpaDao.getMpaByFilmId(film.getId()));
+            film.setGenres(filmGenreDao.readGenresByFilmId(film.getId()));
+        }
+        return allFilms;
     }
 
     public Film update(Film film) {
-        if (validateFilmId(film.getId())) {
-            validate(film);
+        validate(film);
+        if (filmDao.getFilmById(film.getId()) != null) {
+            Film updateFilm = filmDao.update(film);
+            updateFilm.setMpa(mpaDao.getMpaById(film.getMpa().getId()));
             if (film.getGenres() != null) {
                 filmGenreDao.delete(film.getId());
-                addFilmGenre(film.getId(), new HashSet<>(film.getGenres()));
-                film.setGenres(filmGenreDao.readGenresByFilmId(film.getId()));
+                addFilmGenre(updateFilm.getId(), new HashSet<>(film.getGenres()));
+                updateFilm.setGenres(filmGenreDao.readGenresByFilmId(film.getId()));
             }
-            filmDao.update(film);
-            log.info("Фильм с id '{}' обновлен", film.getId());
-            return film;
+            log.info("Фильм с id '{}' обновлен", updateFilm.getId());
+            return updateFilm;
         } else {
             log.info("NoMovieFoundException (Фильм не может быть обновлен, т.к. его нет в списке)");
             throw new EntityNotFoundException("Фильм не может быть обновлен, т.к. его нет в списке");
@@ -73,14 +80,17 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
-        if (validateFilmId(id)) {
-            return filmDao.getFilmById(id);
+        if (filmDao.getFilmById(id) != null) {
+            Film getFilm = filmDao.getFilmById(id);
+            getFilm.setMpa(mpaDao.getMpaByFilmId(id));
+            getFilm.setGenres(filmGenreDao.readGenresByFilmId(id));
+            return getFilm;
         } else {
             throw new EntityNotFoundException(String.format("Фильма с id=%d нет в списке", id));
         }
     }
     public void addLike(int userId, int filmId) {
-        if (userService.validateUserId(userId) && validateFilmId(filmId)) {
+        if (userDao.getUserById(userId) != null && filmDao.getFilmById(filmId) != null) {
             filmLikeDao.create(userId, filmId);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
@@ -92,7 +102,7 @@ public class FilmService {
     }
 
     public void removeLike(int userId, int filmId) {
-        if (userService.validateUserId(userId) && validateFilmId(filmId)) {
+        if (userDao.getUserById(userId) != null && filmDao.getFilmById(filmId) != null) {
             filmLikeDao.delete(userId, filmId);
         } else {
             throw new EntityNotFoundException("Объект не найден. Необходимо проверить id");
@@ -100,7 +110,12 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-        return filmLikeDao.getPopularFilms(count);
+        List<Film> popularFilms = filmLikeDao.getPopularFilms(count);
+        for (Film film :popularFilms) {
+            film.setMpa(mpaDao.getMpaByFilmId(film.getId()));
+            film.setGenres(filmGenreDao.readGenresByFilmId(film.getId()));
+        }
+        return popularFilms;
     }
 
     private void validate(Film film) {
@@ -120,20 +135,10 @@ public class FilmService {
             log.info("ValidationException (Продолжительность фильма имеет отрицательное значение)");
             throw new ValidationException("Продолжительность фильма имеет отрицательное значение");
         }
-        if (film.getId() < 0) {
+        /*if (film.getId() < 0) {
             log.info("ValidationException (Значение id не может быть отрицательным)");
             throw new ValidationException("Значение id не может быть отрицательным");
-        }
+        }*/
     }
 
-    private boolean validateFilmId(int id) {
-        boolean isInStock = false;
-        for (Film film : filmDao.readAll()) {
-            int filmId = film.getId();
-            if (filmId == id) {
-                isInStock = true;
-            }
-        }
-        return isInStock;
-    }
 }
