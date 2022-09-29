@@ -135,10 +135,6 @@ public class FilmService {
             log.info("ValidationException (Продолжительность фильма имеет отрицательное значение)");
             throw new ValidationException("Продолжительность фильма имеет отрицательное значение");
         }
-        /*if (film.getId() < 0) {
-            log.info("ValidationException (Значение id не может быть отрицательным)");
-            throw new ValidationException("Значение id не может быть отрицательным");
-        }*/
     }
 
 }
