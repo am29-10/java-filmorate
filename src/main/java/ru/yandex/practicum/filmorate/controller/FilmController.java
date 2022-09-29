@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film get(@PathVariable int id) {
+    public Film get(@Valid @PathVariable int id) {
         log.info("Получен запрос GET /films/{}", id);
         return filmService.getFilmById(id);
     }
@@ -29,35 +30,35 @@ public class FilmController {
     @GetMapping
     public List<Film> getAll() {
         log.info("Получен запрос GET /films");
-        return new ArrayList<>(filmService.readAll().values());
+        return new ArrayList<>(filmService.readAll());
     }
 
     @PostMapping
-    public Film create(@RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) {
         log.info("Получен запрос POST /films");
         return filmService.create(film);
     }
 
     @PutMapping
-    public Film update(@RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         log.info("Получен запрос PUT /films");
         return filmService.update(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable int id, @PathVariable int userId) {
+    public void addLike(@Valid @PathVariable int id, @Valid @PathVariable int userId) {
         log.info("Получен запрос PUT /films/{}/like/{}", id, userId);
         filmService.addLike(userId, id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
+    public void deleteLike(@Valid @PathVariable int id, @Valid @PathVariable int userId) {
         log.info("Получен запрос DELETE /films/{}/like/{}", id, userId);
         filmService.removeLike(userId, id);
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> getPopularFilms(@Valid @RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос GET /films/popular");
         return filmService.getPopularFilms(count);
     }
