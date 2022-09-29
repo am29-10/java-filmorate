@@ -32,13 +32,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void testAddUserShouldNamePetr() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
+		createPetr();
 		Optional<User> optionalUser = Optional.of(userService.getUserById(1));
 		assertThat(optionalUser)
 				.isPresent()
@@ -48,103 +42,41 @@ class FilmorateApplicationTests {
 
 	@Test
 	void testGetUsersShouldSize2() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
-		User user2 = new User().toBuilder()
-				.name("Petr2")
-				.login("petr212")
-				.email("p212@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user2);
+		createPetr();
+		createPetr2();
+
 		assertThat(userService.readAll()).hasSize(2);
 	}
 
 	@Test
 	void testGetFriendsShouldSize2() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
+		User user1 = createPetr();
+		User user2 = createPetr2();
+		User user3 = createPetr3();
+		userService.addFriend(user1.getId(), user2.getId());
 
-		User user2 = new User().toBuilder()
-				.name("Petr2")
-				.login("petr212")
-				.email("p212@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user2);
-
-		userService.addFriend(user.getId(), user2.getId());
-
-		User user3 = new User().toBuilder()
-				.name("Petr23")
-				.login("petr2123")
-				.email("p2123@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user3);
-
-		userService.addFriend(user.getId(), user3.getId());
+		userService.addFriend(user1.getId(), user3.getId());
 		assertThat(userService.getFriendsForUserId(1)).hasSize(2);
 	}
 
 	@Test
 	void testGetCommonFriendsShouldId1() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
+		User user = createPetr();
 
-		User user2 = new User().toBuilder()
-				.name("Petr2")
-				.login("petr212")
-				.email("p212@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user2);
+		User user2 = createPetr2();
 
-		User user3 = new User().toBuilder()
-				.name("Petr23")
-				.login("petr2123")
-				.email("p2123@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user3);
+		User user3 = createPetr3();
 
-		userService.addFriend(user.getId(), user2.getId());
-		userService.addFriend(user.getId(), user3.getId());
+		userService.addFriend(user2.getId(), user.getId());
+		userService.addFriend(user3.getId(), user.getId());
 		assertThat(userService.getCommonFriends(2, 3)).hasSize(1);
 	}
 
 	@Test
 	void testDeleteFriendShouldIsEmpty() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
+		User user = createPetr();
 
-		User user2 = new User().toBuilder()
-				.name("Petr2")
-				.login("petr212")
-				.email("p212@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user2);
+		User user2 = createPetr2();
 
 		userService.addFriend(user.getId(), user2.getId());
 		assertThat(userService.getFriendsForUserId(1)).hasSize(1);
@@ -154,13 +86,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void testUpdateUserShouldNamePetr() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
+		User user = createPetr();
 
 		user.setName("Petr22");
 		userService.update(user);
@@ -170,88 +96,39 @@ class FilmorateApplicationTests {
 	@Test
 	void testGetFilmsShouldSize2() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film);
+		Film film = createFilm(mpa);
 
-		Film film2 = new Film().toBuilder()
-				.name("Film2")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film2);
+		Film film2 = createFilm2(mpa);
 		assertThat(filmService.readAll()).hasSize(2);
 	}
 
 	@Test
 	void testGetFilmShouldTitleFilm() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film);
+		Film film = createFilm(mpa);
 		assertThat(filmService.getFilmById(1).getName()).isEqualTo("Film");
 	}
 
 	@Test
 	void testGetPopularFilmsShouldSize2() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film);
+		Film film = createFilm(mpa);
 
-		Film film2 = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film2);
+		Film film2 = createFilm2(mpa);
 		assertThat(filmService.getPopularFilms(2)).hasSize(2);
 	}
 
 	@Test
 	void testCreateFilmShouldTitleFilm() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film);
+		Film film = createFilm(mpa);
 		assertThat(filmService.getFilmById(1).getName()).isEqualTo("Film");
 	}
 
 	@Test
 	void testUpdateFilmShouldTitleOtherFilm() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film);
+		Film film = createFilm(mpa);
 		film.setName("Film22");
 		filmService.update(film);
 		assertThat(filmService.getFilmById(1).getName()).isEqualTo("Film22");
@@ -259,23 +136,10 @@ class FilmorateApplicationTests {
 
 	@Test
 	void testUserLikeFilmShouldCount1() {
-		User user = new User().toBuilder()
-				.name("Petr")
-				.login("petr21")
-				.email("p21@mail.ru")
-				.birthday(LocalDate.of(1990, 1, 1))
-				.build();
-		userService.create(user);
+		User user = createPetr();
 
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = new Film().toBuilder()
-				.name("Film")
-				.description("abc")
-				.duration(150)
-				.releaseDate(LocalDate.of(1999, 1, 1))
-				.mpa(mpa)
-				.build();
-		filmService.create(film);
+		Film film = createFilm(mpa);
 
 		filmService.addLike(userService.getUserById(1).getId(), filmService.getFilmById(1).getId());
 		assertThat(filmLikeDao.readLikesByFilmId(1)).hasSize(1);
@@ -308,6 +172,58 @@ class FilmorateApplicationTests {
 		assertThat(genreService.getGenreById(4)).hasFieldOrPropertyWithValue("name", "Боевик");
 		assertThat(genreService.getGenreById(5)).hasFieldOrPropertyWithValue("name", "Триллер");
 		assertThat(genreService.getGenreById(6)).hasFieldOrPropertyWithValue("name", "Приключения");
+	}
+
+	private User createPetr() {
+		User user = new User().toBuilder()
+				.name("Petr")
+				.login("petr21")
+				.email("p21@mail.ru")
+				.birthday(LocalDate.of(1990, 1, 1))
+				.build();
+		return userService.create(user);
+	}
+
+	private User createPetr2() {
+		User user2 = new User().toBuilder()
+				.name("Petr2")
+				.login("petr212")
+				.email("p212@mail.ru")
+				.birthday(LocalDate.of(1990, 1, 1))
+				.build();
+		return userService.create(user2);
+	}
+
+	private User createPetr3() {
+		User user3 = new User().toBuilder()
+				.name("Petr23")
+				.login("petr2123")
+				.email("p2123@mail.ru")
+				.birthday(LocalDate.of(1990, 1, 1))
+				.build();
+		return userService.create(user3);
+	}
+
+	private Film createFilm(Mpa mpa) {
+		Film film = new Film().toBuilder()
+				.name("Film")
+				.description("abc")
+				.duration(150)
+				.releaseDate(LocalDate.of(1999, 1, 1))
+				.mpa(mpa)
+				.build();
+		return filmService.create(film);
+	}
+
+	private Film createFilm2(Mpa mpa) {
+		Film film2 = new Film().toBuilder()
+				.name("Film2")
+				.description("abc")
+				.duration(150)
+				.releaseDate(LocalDate.of(1999, 1, 1))
+				.mpa(mpa)
+				.build();
+		return filmService.create(film2);
 	}
 
 }
