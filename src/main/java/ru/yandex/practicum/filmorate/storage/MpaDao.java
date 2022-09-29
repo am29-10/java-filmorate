@@ -14,4 +14,6 @@ public interface MpaDao {
     Mpa update(Mpa mpa);
 
     Mpa getMpaById(int id);
+
+    Mpa getMpaByFilmId(int id);
 }
