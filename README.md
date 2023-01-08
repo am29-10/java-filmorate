@@ -1,2 +1,19 @@
-# java-filmorate
-Template repository for Filmorate project.
+<p align="center">
+  <img src="images/Filmorate%20log.png">
+</p>
+
+## Назначение:
+**Filmorate** — социальная сеть, которая поможет выбрать кино на основе того, какие фильмы вы и ваши друзья смотрите и какие оценки им ставите.
+
+## Сервисы:
+* **Main** — содержит всю основную логику приложения.  
+  Порт: 8080
+    * API для работы с пользователями
+    * API для работы с жанрами фильмов
+    * API для работы с MPA
+    * API для работы с фильмами
+
+## Схема базы данных:
+<p align="center">
+  <img src="images/filmprateDB.png">
+</p>
