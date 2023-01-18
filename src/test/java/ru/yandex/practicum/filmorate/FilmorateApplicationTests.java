@@ -96,32 +96,30 @@ class FilmorateApplicationTests {
 	@Test
 	void testGetFilmsShouldSize2() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = createFilm(mpa);
-
-		Film film2 = createFilm2(mpa);
+		createFilm(mpa);
+		createFilm2(mpa);
 		assertThat(filmService.readAll()).hasSize(2);
 	}
 
 	@Test
 	void testGetFilmShouldTitleFilm() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = createFilm(mpa);
+		createFilm(mpa);
 		assertThat(filmService.getFilmById(1).getName()).isEqualTo("Film");
 	}
 
 	@Test
 	void testGetPopularFilmsShouldSize2() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = createFilm(mpa);
-
-		Film film2 = createFilm2(mpa);
+		createFilm(mpa);
+		createFilm2(mpa);
 		assertThat(filmService.getPopularFilms(2)).hasSize(2);
 	}
 
 	@Test
 	void testCreateFilmShouldTitleFilm() {
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = createFilm(mpa);
+		createFilm(mpa);
 		assertThat(filmService.getFilmById(1).getName()).isEqualTo("Film");
 	}
 
@@ -136,10 +134,10 @@ class FilmorateApplicationTests {
 
 	@Test
 	void testUserLikeFilmShouldCount1() {
-		User user = createPetr();
+		createPetr();
 
 		Mpa mpa = mpaService.getMpaById(1);
-		Film film = createFilm(mpa);
+		createFilm(mpa);
 
 		filmService.addLike(userService.getUserById(1).getId(), filmService.getFilmById(1).getId());
 		assertThat(filmLikeDao.readLikesByFilmId(1)).hasSize(1);
@@ -169,9 +167,9 @@ class FilmorateApplicationTests {
 		assertThat(genreService.getGenreById(1)).hasFieldOrPropertyWithValue("name", "Комедия");
 		assertThat(genreService.getGenreById(2)).hasFieldOrPropertyWithValue("name", "Драма");
 		assertThat(genreService.getGenreById(3)).hasFieldOrPropertyWithValue("name", "Мультфильм");
-		assertThat(genreService.getGenreById(4)).hasFieldOrPropertyWithValue("name", "Боевик");
-		assertThat(genreService.getGenreById(5)).hasFieldOrPropertyWithValue("name", "Триллер");
-		assertThat(genreService.getGenreById(6)).hasFieldOrPropertyWithValue("name", "Приключения");
+		assertThat(genreService.getGenreById(4)).hasFieldOrPropertyWithValue("name", "Триллер");
+		assertThat(genreService.getGenreById(5)).hasFieldOrPropertyWithValue("name", "Документальный");
+		assertThat(genreService.getGenreById(6)).hasFieldOrPropertyWithValue("name", "Боевик");
 	}
 
 	private User createPetr() {
